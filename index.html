@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>张三 · UI/UX 设计师</title>
+
+  <!-- Google Fonts: 标题用 DM Serif Display，正文用 DM Sans，中文用系统字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       CSS 变量 / 设计令牌
+       ============================================= */
+    :root {
+      --black:   #0a0a0a;
+      --white:   #f5f5f3;
+      --grey-1:  #1a1a1a;
+      --grey-2:  #2e2e2e;
+      --grey-3:  #555;
+      --grey-4:  #888;
+      --grey-5:  #ccc;
+      --grey-6:  #e8e8e6;
+      --blue:    #2563eb;
+      --blue-lt: #dbeafe;
+      --font-display: 'DM Serif Display', 'Songti SC', serif;
+      --font-body:    'DM Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --radius: 12px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* =============================================
+       重置 & 基础
+       ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ul { list-style: none; }
+
+    /* =============================================
+       滚动淡入动画
+       ============================================= */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* =============================================
+       导航栏
+       ============================================= */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5vw;
+      height: 64px;
+      background: rgba(245, 245, 243, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--grey-6);
+      transition: box-shadow var(--transition);
+    }
+    nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.07); }
+
+    /* Logo */
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--blue); }
+
+    /* 桌面菜单 */
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--grey-3);
+      letter-spacing: 0.01em;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--black); }
+
+    /* 汉堡按钮（移动端） */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    /* 移动端菜单展开 */
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: var(--white);
+      border-bottom: 1px solid var(--grey-6);
+      padding: 1.5rem 5vw;
+      gap: 1.25rem;
+      z-index: 99;
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--grey-2);
+    }
+
+    /* =============================================
+       通用容器
+       ============================================= */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 5vw;
+    }
+
+    /* 区块标题 */
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      color: var(--black);
+      margin-bottom: 1.25rem;
+    }
+    .section-desc {
+      font-size: 1rem;
+      color: var(--grey-3);
+      max-width: 560px;
+      line-height: 1.75;
+    }
+
+    /* 分隔线 */
+    .divider {
+      width: 48px; height: 3px;
+      background: var(--blue);
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* =============================================
+       英雄区 (Hero)
+       ============================================= */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 64px;
+      background: var(--black);
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 背景纹理网格 */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* 蓝色光晕 */
+    #hero::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      top: -100px; right: -100px;
+      background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 4rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue-lt);
+      border: 1px solid rgba(37,99,235,0.4);
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 1.5rem;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--blue);
+      border-radius: 50%;
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-name em {
+      font-style: italic;
+      color: var(--grey-4);
+    }
+
+    .hero-bio {
+      font-size: 1rem;
+      color: rgba(245,245,243,0.65);
+      line-height: 1.8;
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* CTA 按钮组 */
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      outline: none;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,99,235,0.35); }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.25);
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05); }
+
+    /* 头像卡片 */
+    .hero-avatar-card {
+      position: relative;
+    }
+    .hero-avatar-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      border-radius: var(--radius);
+      filter: grayscale(15%);
+    }
+
+    /* 浮动徽章 */
+    .hero-badge {
+      position: absolute;
+      background: var(--white);
+      color: var(--black);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .hero-badge.b1 { bottom: 24px; left: -24px; }
+    .hero-badge.b2 { top: 24px; right: -24px; }
+    .hero-badge .num {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--blue);
+      display: block;
+      line-height: 1;
+    }
+
+    /* =============================================
+       关于我
+       ============================================= */
+    #about {
+      padding: 120px 0 100px;
+      background: var(--white);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .about-text p {
+      font-size: 1rem;
+      color: var(--grey-3);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    /* 时间线 */
+    .timeline { margin-top: 2rem; }
+    .timeline-item {
+      display: flex;
+      gap: 1.25rem;
+      padding-bottom: 2rem;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 28px;
+      bottom: 0;
+      width: 1px;
+      background: var(--grey-6);
+    }
+    .tl-dot {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--grey-6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tl-dot.blue { background: var(--blue); }
+    .tl-dot svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2; }
+    .tl-dot.grey svg { stroke: var(--grey-4); }
+    .tl-body h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 2px;
+    }
+    .tl-body .tl-meta {
+      font-size: 0.8rem;
+      color: var(--blue);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .tl-body p {
+      font-size: 0.875rem;
+      color: var(--grey-3);
+      line-height: 1.7;
+    }
+
+    /* =============================================
+       技能展示
+       ============================================= */
+    #skills {
+      padding: 100px 0;
+      background: var(--grey-1);
+      color: var(--white);
+    }
+    #skills .section-title { color: var(--white); }
+    #skills .section-desc { color: var(--grey-4); }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-top: 3rem;
+    }
+
+    .skill-card {
+      background: var(--grey-2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: var(--transition);
+      cursor: default;
+    }
+    .skill-card:hover {
+      border-color: rgba(37,99,235,0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(37,99,235,0.12);
+    }
+    .skill-icon {
+      width: 40px; height: 40px;
+      background: rgba(37,99,235,0.15);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    .skill-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--white);
+    }
+    .skill-card p {
+      font-size: 0.825rem;
+      color: var(--grey-4);
+      line-height: 1.6;
+    }
+
+    /* 技能条 */
+    .skill-bar-list { margin-top: 2.5rem; }
+    .skill-bar-item { margin-bottom: 1.25rem; }
+    .skill-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--grey-5);
+      margin-bottom: 6px;
+    }
+    .skill-bar-track {
+      height: 4px;
+      background: var(--grey-2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .skill-bar-fill.animate { transform: scaleX(1); }
+
+    /* =============================================
+       作品集
+       ============================================= */
+    #portfolio {
+      padding: 120px 0;
+      background: var(--white);
+    }
+
+    .portfolio-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* 项目大卡片 */
+    .project-card {
+      background: var(--white);
+      border: 1px solid var(--grey-6);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: var(--transition);
+      margin-bottom: 2rem;
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+      border-color: transparent;
+    }
+
+    .project-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* 左：图片区域 */
+    .project-visual {
+      position: relative;
+      background: #e8edf5;
+      min-height: 420px;
+      overflow: hidden;
+    }
+    .project-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .project-card:hover .project-visual img { transform: scale(1.04); }
+
+    /* 图片叠加标签 */
+    .project-tag-img {
+      position: absolute;
+      top: 16px; left: 16px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 99px;
+    }
+
+    /* 右：文字区域 */
+    .project-content {
+      padding: 3rem 3rem 3rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .project-year {
+      font-size: 0.78rem;
+      color: var(--grey-4);
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.06em;
+    }
+    .project-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--black);
+    }
+    .project-subtitle {
+      font-size: 0.95rem;
+      color: var(--blue);
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+    }
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--grey-3);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    /* 统计指标 */
+    .project-stats {
+      display: flex;
+      gap: 2rem;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--grey-6);
+      margin-bottom: 1.75rem;
+    }
+    .stat-item .num {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--black);
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-item .label {
+      font-size: 0.78rem;
+      color: var(--grey-4);
+    }
+
+    /* 标签列表 */
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 1.75rem;
+    }
+    .project-tags span {
+      background: var(--grey-6);
+      color: var(--grey-3);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 99px;
+    }
+
+    /* 项目内容详情块 */
+    .project-details {
+      background: var(--grey-6);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .project-details h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+      margin-bottom: 0.75rem;
+    }
+    .project-details ul {
+      list-style: none;
+    }
+    .project-details ul li {
+      font-size: 0.85rem;
+      color: var(--grey-2);
+      line-height: 1.7;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .project-details ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+      font-size: 0.75rem;
+    }
+
+    /* =============================================
+       联系方式
+       ============================================= */
+    #contact {
+      padding: 120px 0;
+      background: var(--black);
+      color: var(--white);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #contact::before {
+      content: '';
+      position: absolute;
+      width: 800px; height: 400px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, rgba(37,99,235,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    #contact .section-title { color: var(--white); position: relative; z-index: 1; }
+    #contact .section-desc {
+      color: var(--grey-4);
+      margin: 0 auto 3rem;
+      position: relative; z-index: 1;
+    }
+
+    .contact-box {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--grey-1);
+      border: 1px solid var(--grey-2);
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      width: 320px;
+      transition: var(--transition);
+    }
+    .contact-item:hover {
+      border-color: rgba(37,99,235,0.5);
+      background: var(--grey-2);
+      transform: translateX(4px);
+    }
+    .contact-icon {
+      width: 40px; height: 40px;
+      background: rgba(37,99,235,0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .contact-item .info { text-align: left; }
+    .contact-item .info span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--grey-4);
+      margin-bottom: 2px;
+    }
+    .contact-item .info strong {
+      font-size: 0.95rem;
+      color: var(--white);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--black);
+      border-top: 1px solid var(--grey-2);
+      padding: 1.5rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    footer p {
+      font-size: 0.8rem;
+      color: var(--grey-4);
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--white);
+    }
+    .footer-logo span { color: var(--blue); }
+
+    /* =============================================
+       响应式 — 平板 / 手机
+       ============================================= */
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-avatar-card {
+        max-width: 300px;
+        margin: 0 auto;
+      }
+      .hero-badge.b1 { left: 0; }
+      .hero-badge.b2 { right: 0; }
+      .hero-bio { margin: 0 auto 2.5rem; }
+      .hero-ctas { justify-content: center; }
+
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .project-inner { grid-template-columns: 1fr; }
+      .project-visual { min-height: 260px; }
+      .project-content { padding: 2rem; }
+
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+    }
+
+    @media (max-width: 600px) {
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+      .project-stats { gap: 1rem; }
+      .contact-item { width: 100%; max-width: 340px; }
+      .portfolio-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================
+       导航栏
+       ======================================== -->
+  <nav id="navbar">
+    <div class="nav-logo">张三<span>.</span></div>
+
+    <!-- 桌面导航 -->
+    <ul class="nav-links">
+      <li><a href="#about">关于我</a></li>
+      <li><a href="#skills">技能</a></li>
+      <li><a href="#portfolio">作品集</a></li>
+      <li><a href="#contact">联系我</a></li>
+    </ul>
+
+    <!-- 移动端汉堡按钮 -->
+    <div class="nav-toggle" id="navToggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- 移动端下拉菜单 -->
+  <div class="nav-mobile" id="navMobile">
+    <a href="#about" class="nav-mobile-link">关于我</a>
+    <a href="#skills" class="nav-mobile-link">技能</a>
+    <a href="#portfolio" class="nav-mobile-link">作品集</a>
+    <a href="#contact" class="nav-mobile-link">联系我</a>
+  </div>
+
+  <!-- ========================================
+       英雄区 Hero
+       ======================================== -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+
+        <!-- 左：文字 -->
+        <div class="hero-text">
+          <div class="hero-tag">UI / UX 设计师</div>
+
+          <h1 class="hero-name">
+            张&nbsp;三<br />
+            <em>Design for People</em>
+          </h1>
+
+          <p class="hero-bio">
+            你好，我是张三，一名专注用户体验与界面设计的 UI/UX 设计师。我擅长以用户为中心，通过调研、原型、视觉与交互设计，打造好用、好看、好理解的数字产品。
+          </p>
+
+          <div class="hero-ctas">
+            <a href="#portfolio" class="btn btn-primary">
+              <!-- 箭头图标 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              查看作品集
+            </a>
+            <a href="#contact" class="btn btn-outline">联系我</a>
+          </div>
+        </div>
+
+        <!-- 右：头像卡片（使用 UI Avatars 服务生成占位头像） -->
+        <div class="hero-avatar-card">
+          <img
+            class="hero-avatar-img"
+            src="https://ui-avatars.com/api/?name=%E5%BC%A0%E4%B8%89&size=600&background=1a2744&color=dbeafe&bold=true&font-size=0.35"
+            alt="张三头像"
+          />
+          <!-- 浮动徽章 -->
+          <div class="hero-badge b1">
+            <span class="num">4+</span>
+            年设计经验
+          </div>
+          <div class="hero-badge b2">
+            <span class="num">阿里</span>
+            巴巴
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       关于我 About
+       ======================================== -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+
+        <!-- 左：个人介绍 -->
+        <div class="about-text fade-in">
+          <div class="section-label">About Me</div>
+          <h2 class="section-title">用设计<br />连接人与数字世界</h2>
+          <div class="divider"></div>
+          <p>
+            你好，我是张三，一名专注用户体验与界面设计的 UI/UX 设计师。我擅长以用户为中心，通过调研、原型、视觉与交互设计，打造好用、好看、好理解的数字产品。
+          </p>
+          <p>
+            注重界面美感、操作逻辑与情感体验，擅长把复杂需求简化为清晰流畅的设计方案，追求让设计真正服务于人。在阿里巴巴任职期间，主导淘宝 APP 多个核心页面的 UI 与交互体验设计，并积极探索 AI 辅助设计的落地应用。
+          </p>
+          <p>
+            <strong>📞 联系电话：</strong>1234567890
+          </p>
+        </div>
+
+        <!-- 右：时间线（学历 + 工作） -->
+        <div class="timeline fade-in">
+          <div class="section-label" style="margin-bottom:1.5rem;">Experience</div>
+
+          <!-- 工作经历 -->
+          <div class="timeline-item">
+            <div class="tl-dot blue">
+              <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            </div>
+            <div class="tl-body">
+              <h4>阿里巴巴 · UI/UX 设计师</h4>
+              <div class="tl-meta">2021 — 2025</div>
+              <p>负责淘宝 APP 首页、商品详情、搜索、个人中心等核心页面的 UI 视觉与交互体验设计；参与用户调研与可用性测试；搭建并维护组件化设计系统；探索 AI 辅助设计在界面生成与体验优化中的落地应用。</p>
+            </div>
+          </div>
+
+          <!-- 学习经历 -->
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--grey-6);">
+              <svg viewBox="0 0 24 24" stroke="var(--grey-3)"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div class="tl-body">
+              <h4>南京信息工程大学 · 本科</h4>
+              <div class="tl-meta">2016 — 2020</div>
+              <p>完成本科阶段学习，系统掌握设计理论、用户研究、交互原型与视觉设计方法论。</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       技能展示 Skills
+       ======================================== -->
+  <section id="skills">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label">Skills</div>
+        <h2 class="section-title">核心技能</h2>
+        <div class="divider"></div>
+        <p class="section-desc">从用户调研到高保真交付，覆盖完整的 UX 设计链路，工具与方法并重。</p>
+      </div>
+
+      <!-- 技能卡片网格 -->
+      <div class="skills-grid">
+        <div class="skill-card fade-in">
+          <div class="skill-icon">🎨</div>
+          <h3>UI 视觉设计</h3>
+          <p>Figma / Sketch，高保真原型、视觉规范、切图与标注，保障多端一致性。</p>
+        </div>
+        <div class="skill-card fade-in">
+          <div class="skill-icon">🔬</div>
+          <h3>用户研究</h3>
+          <p>用户访谈、可用性测试、数据分析，基于行为与反馈推动体验优化。</p>
+        </div>
+        <div class="skill-card fade-in">
+          <div class="skill-icon">⚡</div>
+          <h3>交互设计</h3>
+          <p>信息架构、流程梳理、交互规范，降低学习成本与操作失误率。</p>
+        </div>
+        <div class="skill-card fade-in">
+          <div class="skill-icon">🤖</div>
+          <h3>AI 辅助设计</h3>
+          <p>探索 AI 在界面生成、分镜制作与体验优化中的创新应用，提升产出效率。</p>
+        </div>
+        <div class="skill-card fade-in">
+          <div class="skill-icon">🧩</div>
+          <h3>设计系统</h3>
+          <p>搭建与维护组件化设计系统，统一视觉语言，提升团队设计效率。</p>
+        </div>
+        <div class="skill-card fade-in">
+          <div class="skill-icon">🤝</div>
+          <h3>跨团队协作</h3>
+          <p>跟进开发实现，推动体验问题闭环，保障设计意图完整落地。</p>
+        </div>
+      </div>
+
+      <!-- 技能熟练度条 -->
+      <div class="skill-bar-list fade-in" style="margin-top:3.5rem; max-width:600px;">
+        <div class="skill-bar-item">
+          <div class="skill-bar-label"><span>Figma / Sketch</span><span>95%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="--w:0.95"></div></div>
+        </div>
+        <div class="skill-bar-item">
+          <div class="skill-bar-label"><span>用户研究</span><span>88%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="--w:0.88"></div></div>
+        </div>
+        <div class="skill-bar-item">
+          <div class="skill-bar-label"><span>交互设计</span><span>90%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="--w:0.90"></div></div>
+        </div>
+        <div class="skill-bar-item">
+          <div class="skill-bar-label"><span>设计系统</span><span>85%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="--w:0.85"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       作品集 Portfolio
+       ======================================== -->
+  <section id="portfolio">
+    <div class="container">
+      <div class="portfolio-header fade-in">
+        <div>
+          <div class="section-label">Portfolio</div>
+          <h2 class="section-title">精选项目</h2>
+          <div class="divider"></div>
+        </div>
+        <p class="section-desc" style="max-width:340px;">以下是我在用户体验设计领域的代表性案例。</p>
+      </div>
+
+      <!-- 项目卡片：银龄通 -->
+      <div class="project-card fade-in">
+        <div class="project-inner">
+
+          <!-- 左：项目图片 -->
+          <div class="project-visual">
+            <div class="project-tag-img">UX Research · UI Design</div>
+            <!--
+              使用 Unsplash 精准搜索：老年人使用手机的真实照片
+              Source: unsplash.com
+            -->
+            <img
+              src="https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&q=80&auto=format&fit=crop"
+              alt="老年人使用数字设备——银龄通项目封面"
+              loading="lazy"
+            />
+          </div>
+
+          <!-- 右：项目内容 -->
+          <div class="project-content">
+            <div class="project-year">2024 · 适老化交互设计</div>
+            <h3 class="project-title">银龄通<br />老年人数字生活助手</h3>
+            <div class="project-subtitle">让老年人安全、独立、自信地使用科技产品</div>
+
+            <p class="project-desc">
+              全球老龄化加剧，大量老年人因认知衰退、感官退化、技术焦虑等原因被排除在数字生活之外。本项目通过用户中心设计（UCD）流程，深入挖掘老年人真实痛点，提出系统性适老化交互解决方案。
+            </p>
+
+            <!-- 关键数据 -->
+            <div class="project-stats">
+              <div class="stat-item">
+                <span class="num">96.9%</span>
+                <span class="label">中国老年人数字排斥率</span>
+              </div>
+              <div class="stat-item">
+                <span class="num">74.9%</span>
+                <span class="label">使用智能设备产生挫败感</span>
+              </div>
+              <div class="stat-item">
+                <span class="num">68%</span>
+                <span class="label">依赖他人代操作</span>
+              </div>
+            </div>
+
+            <!-- 标签 -->
+            <div class="project-tags">
+              <span>用户调研</span>
+              <span>用户画像</span>
+              <span>适老化设计</span>
+              <span>交互原型</span>
+              <span>可用性测试</span>
+              <span>Figma</span>
+            </div>
+
+            <!-- 设计要点 -->
+            <div class="project-details">
+              <h4>核心设计策略</h4>
+              <ul>
+                <li>简化操作路径：核心任务步骤 ≤ 3 步，大字体 + 语音引导并行</li>
+                <li>两类用户画像：被动依赖型（王桂兰，68岁）& 积极尝试型（李建国，72岁）</li>
+                <li>降低焦虑：清晰的错误提示与恢复机制，消除"点坏手机"恐惧</li>
+                <li>高频需求优先：健康管理 48%、社交联系 32%、日常服务 15%</li>
+                <li>零广告 / 零弹窗干扰，适老化对比度与触控区域设计</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- / 项目卡片 -->
+
+    </div>
+  </section>
+
+  <!-- ========================================
+       联系方式 Contact
+       ======================================== -->
+  <section id="contact">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label" style="color:var(--blue-lt);">Contact</div>
+        <h2 class="section-title">期待与你合作</h2>
+        <p class="section-desc">有项目想聊，或者只是打个招呼，随时欢迎联系！</p>
+      </div>
+
+      <div class="contact-box fade-in">
+        <!-- 电话 -->
+        <div class="contact-item">
+          <div class="contact-icon">📱</div>
+          <div class="info">
+            <span>电话 / 微信</span>
+            <strong>1234567890</strong>
+          </div>
+        </div>
+
+        <!-- 职业 -->
+        <div class="contact-item">
+          <div class="contact-icon">💼</div>
+          <div class="info">
+            <span>当前状态</span>
+            <strong>UI/UX 设计师 · 开放机会</strong>
+          </div>
+        </div>
+
+        <!-- 所在地 -->
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div class="info">
+            <span>所在城市</span>
+            <strong>中国 · 期望远程 / 实地均可</strong>
+          </div>
+        </div>
+
+        <a href="tel:1234567890" class="btn btn-primary" style="margin-top:0.5rem; padding: 14px 40px; font-size:1rem;">
+          立即联系 →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       页脚 Footer
+       ======================================== -->
+  <footer>
+    <div class="footer-logo">张三<span>.</span></div>
+    <p>© 2025 张三 · UI/UX 设计师 · All rights reserved.</p>
+  </footer>
+
+  <!-- ========================================
+       JavaScript：导航 / 滚动动画 / 技能条
+       ======================================== -->
+  <script>
+    /* --- 导航：滚动添加阴影 --- */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    /* --- 移动端汉堡菜单 --- */
+    const toggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('navMobile');
+    toggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    // 点击移动端链接后关闭菜单
+    document.querySelectorAll('.nav-mobile-link').forEach(link => {
+      link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    });
+
+    /* --- 滚动淡入动画（Intersection Observer） --- */
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // 根据同一区块内的顺序添加延迟，实现交错淡入
+          const siblings = entry.target.parentElement.querySelectorAll('.fade-in');
+          let delay = 0;
+          siblings.forEach((el, idx) => { if (el === entry.target) delay = idx * 80; });
+          entry.target.style.transitionDelay = delay + 'ms';
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    fadeEls.forEach(el => observer.observe(el));
+
+    /* --- 技能条动画 --- */
+    const barFills = document.querySelectorAll('.skill-bar-fill');
+    const barObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const fill = entry.target;
+          const w = parseFloat(fill.style.getPropertyValue('--w'));
+          fill.style.transform = `scaleX(${w})`;
+          barObserver.unobserve(fill);
+        }
+      });
+    }, { threshold: 0.5 });
+    barFills.forEach(fill => barObserver.observe(fill));
+  </script>
+
+</body>
+</html>
